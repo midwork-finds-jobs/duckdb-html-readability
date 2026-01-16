@@ -19,5 +19,5 @@ crate-type = ["staticlib"]
 duckdb = { version = "=1.4.3", features = ["vtab-loadable", "vscalar"] }
 duckdb-loadable-macros = "=0.1.13"
 libduckdb-sys = { version = "=1.4.3", features = ["loadable-extension"] }
-readability = "0.3"
+readability = { version = "0.3", default-features = false }
 url = "2"
