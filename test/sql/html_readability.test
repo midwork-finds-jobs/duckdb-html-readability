@@ -1,0 +1,42 @@
+# name: test/sql/html_readability.test
+# description: test html_readability extension
+# group: [html_readability]
+
+# Before we load the extension, this will fail
+statement error
+SELECT parse_html('<html></html>');
+----
+Catalog Error: Scalar Function with name parse_html does not exist!
+
+# Require statement will ensure the extension is loaded from now on
+require html_readability
+
+# Basic HTML parsing test
+query III
+SELECT
+    (parse_html('<html><head><title>Test Title</title></head><body><article><p>Hello World</p></article></body></html>')).title,
+    (parse_html('<html><head><title>Test Title</title></head><body><article><p>Hello World</p></article></body></html>')).text LIKE '%Hello World%',
+    length((parse_html('<html><head><title>Test Title</title></head><body><article><p>Hello World</p></article></body></html>')).content) > 0;
+----
+Test Title	true	true
+
+# Test with more complex HTML
+query I
+SELECT (parse_html('
+<html>
+<head>
+    <title>Article Page</title>
+</head>
+<body>
+    <header>Navigation</header>
+    <article>
+        <h1>Main Content</h1>
+        <p>This is the main article content that should be extracted.</p>
+        <p>It has multiple paragraphs.</p>
+    </article>
+    <footer>Footer</footer>
+</body>
+</html>
+')).title;
+----
+Article Page
