@@ -4,7 +4,6 @@ extern crate libduckdb_sys;
 
 use duckdb::{
     core::{DataChunkHandle, Inserter, LogicalTypeHandle, LogicalTypeId},
-    ffi,
     ffi::duckdb_string_t,
     types::DuckString,
     vscalar::{ScalarFunctionSignature, VScalar},
@@ -26,14 +25,14 @@ struct ParseHtmlFunction;
 impl VScalar for ParseHtmlFunction {
     type State = ParseHtmlState;
 
-    unsafe fn invoke(
+    fn invoke(
         _state: &Self::State,
         input: &mut DataChunkHandle,
         output: &mut dyn WritableVector,
     ) -> Result<(), Box<dyn Error>> {
         let count = input.len();
         let values = input.flat_vector(0);
-        let values = values.as_slice_with_len::<duckdb_string_t>(count);
+        let values = unsafe { values.as_slice_with_len::<duckdb_string_t>(count) };
 
         // Get the struct vector and its children
         let struct_vec = output.struct_vector();
